@@ -1,3 +1,5 @@
 from django.contrib import admin
+from dataset.models import *
 
-# Register your models here.
+admin.site.register(Folder)
+admin.site.register(File)

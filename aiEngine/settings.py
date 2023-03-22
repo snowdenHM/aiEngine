@@ -28,14 +28,28 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+DEFAULT_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
 ]
+
+MY_APPS = [
+    'dataset.apps.DatasetConfig',
+    'modelMarketplace.apps.ModelmarketplaceConfig',
+    'project.apps.ProjectConfig',
+]
+
+THIRD_PARTY_APPS = [
+    'boto3',
+    'rest_framework'
+]
+
+INSTALLED_APPS = DEFAULT_APPS + MY_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -115,3 +129,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AWS_ACCESS_KEY_ID = 'AKIATFJDU736FZEJVKHR'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'aienginebackend'
+AWS_S3_SIGNATURE_NAME = 's3v4',
+AWS_S3_REGION_NAME = 'us-east-1'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_S3_VERITY = True
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
