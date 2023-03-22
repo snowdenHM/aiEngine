@@ -1,2 +1,2 @@
-# aiEngine for Clarify Backend
+# AI Engine for Clarify Backend
 Clarify AI Engine
