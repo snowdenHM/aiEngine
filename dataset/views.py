@@ -49,7 +49,7 @@ def folderCreate(request, parent_id=None):
             return Response(ser.data)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
 def fileView(request, pk=None):
 
     if request.method == 'GET':
@@ -64,14 +64,34 @@ def fileView(request, pk=None):
 
         # Files List View
         files = File.objects.all()
-        data = FileSerializer(folders, many=True).data
+        data = FileSerializer(files, many=True).data
         return Response(data)
+
+
+@api_view(['GET', 'POST'])
+def fileCreate(request, folder_id=None):
 
     if request.method == 'POST':
         # File Create View
-        ser = FolderSerializer(data=request.data)
+        ser = FileSerializer(data=request.data)
         if ser.is_valid(raise_exception=True):
-            print("FILE CREATED")
-            ser.save()
+
+            folder = Folder.objects.get(id=folder_id)
+            doc = ser.validated_data['file_upload']
+            fileName = doc.name
+            fileExt = doc.name.split('.')[-1]
+            fileSize = doc.size
+            filePath = folder.folder_path + "/" + fileName
+
+            file = File(name=fileName,
+                        file_path=filePath,
+                        file_size=fileSize,
+                        file_extension=fileExt,
+                        file_upload=doc,
+                        parent=folder)
+            file.save()
+
+            return Response(ser.data)
+
 
 

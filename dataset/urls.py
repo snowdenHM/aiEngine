@@ -11,4 +11,5 @@ urlpatterns = [
     # file
     path('files', views.fileView),
     path('files/<int:pk>', views.fileView),
+    path('files/create/<int:folder_id>', views.fileCreate),
 ]

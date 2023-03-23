@@ -15,13 +15,17 @@ class Folder(models.Model):
         return self.name
 
 
+def get_upload_path(instance, filename):
+    return instance.parent.folder_path + "/" + filename
+
+
 class File(models.Model):
-    name = models.CharField(max_length=256)
-    file_path = models.CharField(max_length=1024)
-    file_size = models.IntegerField()
-    file_extension = models.CharField(max_length=10)
-    file_upload = models.FileField(upload_to="files", null=True)
-    parent = models.ForeignKey(Folder, on_delete=models.CASCADE)  # link to parent folder
+    name = models.CharField(max_length=256, null=True, blank=True)
+    file_path = models.CharField(max_length=1024, blank=True, null=True)
+    file_size = models.IntegerField(blank=True, null=True)
+    file_extension = models.CharField(max_length=10, blank=True, null=True)
+    file_upload = models.FileField(upload_to=get_upload_path)
+    parent = models.ForeignKey(Folder, on_delete=models.CASCADE, blank=True, null=True)  # link to parent folder
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
