@@ -1,0 +1,128 @@
+{% extends 'layout/app.html' %}
+
+{% block title %} Flow Instance {% endblock %}
+
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb-main">
+                    <h4 class="text-capitalize breadcrumb-title">Flows</h4>
+                    <div class="breadcrumb-action justify-content-center flex-wrap">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="#"><i
+                                        class="las la-home"></i>Workflow</a></li>
+                                <li class="breadcrumb-item active"
+                                    aria-current="page">Flow
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 mb-30">
+                <div class="support-ticket-system support-ticket-system--search">
+                    <div class="userDatatable userDatatable--ticket userDatatable--ticket--2 mt-1">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-borderless">
+                                <thead>
+                                <tr class="userDatatable-header">
+                                    <th>
+                                        <span class="userDatatable-title">ID</span>
+                                    </th>
+                                    <th>
+                                        <span class="userDatatable-title">Workflow</span>
+                                    </th>
+                                    <th>
+                                        <span class="userDatatable-title">Instance</span>
+                                    </th>
+                                    <th>
+                                        <span class="userDatatable-title">State</span>
+                                    </th>
+                                    <th>
+                                        <span class="userDatatable-title">Status</span>
+                                    </th>
+                                    <th class="actions">
+                                        <span class="userDatatable-title">Actions</span>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for flow in data %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <div class="userDatatable-inline-title">
+                                                    <a href="{% url 'clarify:flowInstanceDetails' flow.workflow flow.object_id %}"
+                                                       class="text-dark fw-500">
+                                                        <h6>{{ flow.workflow }}</h6>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <div class="userDatatable-inline-title">
+                                                    <a href="#"
+                                                       class="text-dark fw-500">
+                                                        <h6>{{ flow.content_object }}</h6>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <div class="userDatatable-inline-title">
+                                                    <h6>{{ flow.state }}</h6>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-inline-block">
+                                                {% if flow.status %}
+                                                <span class="media-badge color-white bg-success">Close</span>
+                                                {% else %}
+                                                <span class="media-badge color-white bg-secondary">Open</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <ul class="orderDatatable_actions mb-0 d-flex flex-wrap">
+                                                <li>
+                                                    <a href="#" class="edit">
+                                                        <i class="uil uil-edit"></i>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#"
+                                                       class="remove">
+                                                        <i class="uil uil-trash-alt"></i>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}
+
+

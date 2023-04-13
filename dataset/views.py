@@ -3,8 +3,10 @@ from rest_framework.decorators import api_view
 from django.core.exceptions import ObjectDoesNotExist
 from dataset.models import Folder, File
 from dataset.serializers import FolderSerializer, FileSerializer
+from django.shortcuts import render, redirect
 
 
+####################### FILE STRUCTURE API VIEWS ###########################
 @api_view(['GET'])
 def folderView(request, pk=None):
 
@@ -36,13 +38,13 @@ def folderCreate(request, parent_id=None):
             if parent_id is not None:
                 parent_folder = Folder.objects.get(id=parent_id)
                 folder_path = parent_folder.folder_path + "/" + folder_name
-                folder = Folder(name=folder_name,
+                folder = Folder(folder_name=folder_name,
                                 folder_path=folder_path,
                                 parents=parent_folder)
                 folder.save()
                 parent_folder.folders.add(folder.id)
             else:
-                folder = Folder(name=folder_name,
+                folder = Folder(folder_name=folder_name,
                                 folder_path=folder_name,
                                 parents=None)
                 folder.save()
@@ -83,7 +85,7 @@ def fileCreate(request, folder_id=None):
             fileSize = doc.size
             filePath = folder.folder_path + "/" + fileName
 
-            file = File(name=fileName,
+            file = File(file_name=fileName,
                         file_path=filePath,
                         file_size=fileSize,
                         file_extension=fileExt,
@@ -92,6 +94,8 @@ def fileCreate(request, folder_id=None):
             file.save()
 
             return Response(ser.data)
+
+##################### RENDER VIEWS ######################
 
 
 

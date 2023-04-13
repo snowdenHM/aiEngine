@@ -1,10 +1,20 @@
 from django.urls import path
-from dataset import views
+from project import views
+
+app_name = 'project'
 
 urlpatterns = [
     # folder
-    path('', views.projectView),
-    path('<int:pk>', views.projectView),
-    path('delete/<int:pid>', views.projectDelete),
-    path('update/<int:pid>', views.projectUpdate),
+    # path('api', views.projectView),
+    # path('api/<int:pk>', views.projectView),
+    # path('api/delete/<int:pid>', views.projectDelete),
+    # path('api/update/<int:pid>', views.projectUpdate),
+
+    # views
+    path('', views.index, name='index'),
+    path('projects', views.projectView, name='projects'),
+    path('<int:pk>', views.projectDetailedView, name='project'),
+    path('create', views.createProject, name='projectCreate'),
+    path('update', views.updateProject, name='projectUpdate'),
+    path('delete/<int:pk>', views.deleteProject, name='projectDelete'),
 ]

@@ -3,10 +3,10 @@ from dataset import views
 
 urlpatterns = [
     # folder
-    path('', views.folderView),
-    path('<int:pk>', views.folderView),
-    path('create', views.folderCreate),
-    path('create/<int:parent_id>', views.folderCreate),
+    path('folders', views.folderView),
+    path('folders/<int:pk>', views.folderView),
+    path('folders/create', views.folderCreate),
+    path('folders/create/<int:parent_id>', views.folderCreate),
 
     # file
     path('files', views.fileView),

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import environ
+import os
 
 env = environ.Env()
 environ.Env.read_env()
@@ -49,7 +50,8 @@ MY_APPS = [
 
 THIRD_PARTY_APPS = [
     'boto3',
-    'rest_framework'
+    'rest_framework',
+    'widget_tweaks'
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + MY_APPS + THIRD_PARTY_APPS
@@ -127,6 +129,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
