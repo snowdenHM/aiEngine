@@ -1,101 +1,76 @@
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.base import ContentFile
+from django.contrib import messages
 from dataset.models import Folder, File
-from dataset.serializers import FolderSerializer, FileSerializer
 from django.shortcuts import render, redirect
+from .forms import RawDatasetForm, RawDatasetFileForm
+from .models import RawDataset, RawDatasetFile
+from project.models import Project
+import zipfile
+import time
 
+def rawDatasetCreate(request, pk):
 
-####################### FILE STRUCTURE API VIEWS ###########################
-@api_view(['GET'])
-def folderView(request, pk=None):
+    project = Project.objects.get(id=pk)
+    datasets = RawDataset.objects.filter(project=project.id)
 
-    if request.method == 'GET':
-        # Folder Detail View
-        if pk is not None:
-            try:
-                folder = Folder.objects.get(id=pk)
-                data = FolderSerializer(folder).data
-            except ObjectDoesNotExist:
-                data = {"Error": "Folder does not Exist"}
-            return Response(data)
+    form = RawDatasetForm(request.POST, request.FILES)
+    if form.is_valid():
+        data = form.save(commit=False)
+        data.version_id = len(datasets) + 1
+        data.save()
+        file = request.FILES.get('compressed_file')
+        instances = []
 
-        # Folders List View
-        folders = Folder.objects.all()
-        data = FolderSerializer(folders, many=True).data
-        return Response(data)
+        print(data.parent_folder.folders)
 
+        t = time.time()
+        with zipfile.ZipFile(file, 'r') as z:
 
-@api_view(['GET', 'POST'])
-def folderCreate(request, parent_id=None):
+            train = int(float(request.POST['train_ratio']) / len(z.namelist()) * 100)
+            val = int(float(request.POST['val_ratio']) / len(z.namelist()) * 100)
+            test = int(float(request.POST['test_ratio']) / len(z.namelist()) * 100)
 
-    if request.method == 'POST':
-        # Folder Create View
-        ser = FolderSerializer(data=request.data)
-        if ser.is_valid(raise_exception=True):
-            folder_name = ser.validated_data.get('name')
+            print(train, val, test, len(z.namelist()))
 
-            if parent_id is not None:
-                parent_folder = Folder.objects.get(id=parent_id)
-                folder_path = parent_folder.folder_path + "/" + folder_name
-                folder = Folder(folder_name=folder_name,
-                                folder_path=folder_path,
-                                parents=parent_folder)
-                folder.save()
-                parent_folder.folders.add(folder.id)
-            else:
-                folder = Folder(folder_name=folder_name,
-                                folder_path=folder_name,
-                                parents=None)
-                folder.save()
-            return Response(ser.data)
+            for name in z.namelist():
+                content = z.read(name)
+                content_file = ContentFile(content, name=name)
 
+                rawDatasetFile = RawDatasetFile(
+                    raw_dataset=data,
+                    file_name=name,
+                    file_extension=name.split('.')[-1],
+                    file_path=data.parent_folder.folder_path + "/" + name,
+                    file_size=content_file.size,
+                    file_upload=content_file,
+                    parent=data.parent_folder
+                )
 
-@api_view(['GET'])
-def fileView(request, pk=None):
+                instances.append(rawDatasetFile)
 
-    if request.method == 'GET':
-        # File Detail View
-        if pk is not None:
-            try:
-                file = File.objects.get(id=pk)
-                data = FileSerializer(file).data
-            except ObjectDoesNotExist:
-                data = {"Error": "Folder does not Exist"}
-            return Response(data)
+        RawDatasetFile.objects.bulk_create(instances)
 
-        # Files List View
-        files = File.objects.all()
-        data = FileSerializer(files, many=True).data
-        return Response(data)
+    else:
+        print(form.errors)
 
+    datasets = RawDataset.objects.filter(project=project.id)
 
-@api_view(['GET', 'POST'])
-def fileCreate(request, folder_id=None):
+    context = {
+        "datasets": datasets,
+        "project": project
+        }
+    return render(request, 'pages/project/dataset/datasetTable.html', context)
 
-    if request.method == 'POST':
-        # File Create View
-        ser = FileSerializer(data=request.data)
-        if ser.is_valid(raise_exception=True):
-
-            folder = Folder.objects.get(id=folder_id)
-            doc = ser.validated_data['file_upload']
-            fileName = doc.name
-            fileExt = doc.name.split('.')[-1]
-            fileSize = doc.size
-            filePath = folder.folder_path + "/" + fileName
-
-            file = File(file_name=fileName,
-                        file_path=filePath,
-                        file_size=fileSize,
-                        file_extension=fileExt,
-                        file_upload=doc,
-                        parent=folder)
-            file.save()
-
-            return Response(ser.data)
-
-##################### RENDER VIEWS ######################
-
-
-
+@csrf_exempt
+def datasetDelete(request, pk, data_pk):
+    project = Project.objects.get(id=pk)
+    dataset = RawDataset.objects.get(id=data_pk)
+    dataset.delete()
+    datasets = RawDataset.objects.filter(project=project.id)
+    context = {
+        "datasets": datasets,
+        "project": project
+    }
+    return render(request, 'pages/project/dataset/datasetTable.html', context)

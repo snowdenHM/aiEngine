@@ -1,0 +1,48 @@
+{% load widget_tweaks %}
+<form method="POST" enctype="multipart/form-data" hx-encoding="multipart/form-data">
+    {% csrf_token %}
+    <h5>Dataset</h5>
+    <br>
+    <input type="text" class="form-control" id="id_project" name="project" value="{{ project.id }}" hidden>
+    <div class="row">
+        <div class="form-group">
+            <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Name of Dataset</label>
+            {% render_field datasetForm.name class="form-control" %}
+        </div>
+    </div>
+    <br>
+    <h5>Dataset Split</h5>
+    <br>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Train Ratio</label>
+                {% render_field datasetForm.train_ratio class="form-control" %}
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Validation Ratio</label>
+                {% render_field datasetForm.val_ratio class="form-control" %}
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Test Ratio</label>
+                {% render_field datasetForm.test_ratio class="form-control" %}
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="form-group">
+            <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">File Upload</label>
+            {% render_field datasetForm.compressed_file class="form-control" %}
+        </div>
+    </div>
+    <br>
+    <div class="row d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary" hx-post="{% url 'dataset:datasetCreate' project.id  %}"
+            hx-target="#datasetList" data-bs-dismiss="modal">Submit</button>
+    </div>
+</form>

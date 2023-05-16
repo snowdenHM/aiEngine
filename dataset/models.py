@@ -1,10 +1,13 @@
+import uuid
 from django.db import models
 from project.models import Project
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.exceptions import ValidationError
 ########### File Management System ############
 
 
 class Folder(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     folder_name = models.CharField(max_length=100)
     folder_path = models.CharField(max_length=1024, null=True, blank=True)
     folders = models.ManyToManyField('self', related_name='subFolders', symmetrical=False, blank=True)  # Many folders -> Many sub-folders
@@ -13,25 +16,27 @@ class Folder(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
-
+        return self.folder_name
+    
 
 def get_upload_path(instance, filename):
     return instance.parent.folder_path + "/" + filename
 
 
 class File(models.Model):
+    file_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     file_name = models.CharField(max_length=256, null=True, blank=True)
     file_path = models.CharField(max_length=1024, blank=True, null=True)
     file_size = models.IntegerField(blank=True, null=True)
     file_extension = models.CharField(max_length=10, blank=True, null=True)
     file_upload = models.FileField(upload_to=get_upload_path)
     parent = models.ForeignKey(Folder, on_delete=models.CASCADE, blank=True, null=True)  # link to parent folder
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return self.file_name
+
+    class Meta:
+        abstract = True
 
 
 ############# End of File System ##################
@@ -40,41 +45,41 @@ class File(models.Model):
 ############# Dataset #################
 
 class DatasetBaseModel(models.Model):
-    STATUS_CHOICES = (
-        ("Complete", "Complete"),
-        ("Incomplete", "Incomplete")
-    )
 
     is_active = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
 
     class Meta:
         abstract = True
 
 
 class RawDataset(DatasetBaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256)
+    version_id = models.IntegerField(default=0, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='projectDataset')
     train_ratio = models.FloatField(default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
-    val_ration = models.FloatField(default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
+    val_ratio = models.FloatField(default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
     test_ratio = models.FloatField(default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
-    is_public = models.BooleanField(default=False)
+    parent_folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='dataParentFolder', blank=True)
 
     def __str__(self):
         return f"Raw Dataset: {self.name}"
 
+    def clean(self):
+        total = self.train_ratio + self.val_ratio + self.test_ratio
+        if round(total, 2) != 1:
+            raise ValidationError("The Sum of ratios should be exactly 1")
+
     class Meta:
         verbose_name_plural = 'Raw Dataset'
 
-
 class RawDatasetFile(File):
-    name = models.CharField(max_length=256, null=True, blank=True)
-    raw_dataset = models.ForeignKey(RawDataset, on_delete=models.CASCADE, related_name='rawDataFile')
+    raw_dataset = models.ForeignKey(RawDataset, on_delete=models.CASCADE, related_name='rawDatasetFile', blank=True)
 
     def __str__(self):
-        return f"Raw Dataset File: {self.name}"
+        return f"Raw Dataset File: {self.file_name}"
 
     class Meta:
         verbose_name_plural = 'Raw Dataset File'
@@ -86,7 +91,7 @@ class ProcessedDataset(DatasetBaseModel):
         ('Validation', 'validation'),
         ('Testing', 'testing'),
     )
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256, null=True, blank=True)
     subset = models.CharField(max_length=20, choices=SUBSET_CHOICES, null=True, blank=True)
     sample_counts = models.IntegerField(default=0)
@@ -99,7 +104,8 @@ class ProcessedDataset(DatasetBaseModel):
         verbose_name_plural = 'Processed Dataset'
 
 
-class ProcessedDatasetFile(File):
+class ProcessedDatasetFile(models.Model):
+    id = models.IntegerField(primary_key=True, default=0, blank=True)
     name = models.CharField(max_length=256, null=True, blank=True)
     processed_dataset = models.ForeignKey(ProcessedDataset, on_delete=models.CASCADE, related_name='processedDataFile')
 
@@ -116,7 +122,7 @@ class Annotations(DatasetBaseModel):
         ('Pascal VOC', 'pascalVoc'),
         ('YOLO', 'yolo')
     )
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256, null=True, blank=True)
     processed_dataset = models.ForeignKey(ProcessedDataset, on_delete=models.CASCADE, related_name='annotations',
                                           null=True, blank=True, default=None)
@@ -130,7 +136,8 @@ class Annotations(DatasetBaseModel):
         verbose_name_plural = 'Annotation'
 
 
-class AnnotationFile(File):
+class AnnotationFile(models.Model):
+    id = models.IntegerField(primary_key=True, default=0, blank=True)
     name = models.CharField(max_length=256, null=True, blank=True)
     annotation = models.ForeignKey(Annotations, on_delete=models.CASCADE, related_name='annotationFile')
 

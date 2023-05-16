@@ -11,40 +11,18 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="breadcrumb-main">
-                    <h4 class="text-capitalize breadcrumb-title">{{ flowData.name }} Workflow</h4>
+                    <h4 class="text-capitalize breadcrumb-title">Project - {{ project.project_name }}</h4>
                     <div class="breadcrumb-action justify-content-center flex-wrap">
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#"><i
-                                        class="las la-home"></i>Workflow</a></li>
+                                <li class="breadcrumb-item"><a href="{% url 'project:projects' %}"><i
+                                        class="las la-home"></i>Project</a></li>
                                 <li class="breadcrumb-item active"
-                                    aria-current="page">Flow
+                                    aria-current="page">{{ project.project_name }}
                                 </li>
                             </ol>
                         </nav>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="breadcrumb-main m-0 breadcrumb-main--table justify-content-sm-between ">
-                <div class="action-btn">
-                    {% if flowData.is_deploy %}
-                        <a href="#">
-                            <button type="button" class="btn btn-danger btn-sm">Deployed</button>
-                        </a>
-                    {% else %}
-                        <a href="#">
-                            <button type="button" class="btn btn-success btn-sm">Ready To Deploy</button>
-                        </a>
-                    {% endif %}
-                </div>
-                <div class="action-btn">
-
-                    <a href="{% url 'clarify:generateGraph' flowData.id %}">
-                        <button type="button" class="btn btn-warning btn-sm">Generate Graph</button>
-                    </a>
-
                 </div>
             </div>
         </div>
@@ -58,76 +36,63 @@
                                     <li class="nav-item">
                                         <a class="nav-link active" id="tab-horizontal-1-tab" data-bs-toggle="tab"
                                            href="#tab-horizontal-1"
-                                           role="tab" aria-controls="tab-horizontal-1" aria-selected="true">Nodes</a>
+                                           role="tab" aria-controls="tab-horizontal-1" aria-selected="true">Datasets</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" id="tab-horizontal-2-tab" data-bs-toggle="tab"
                                            href="#tab-horizontal-2"
                                            role="tab" aria-controls="tab-horizontal-1"
-                                           aria-selected="false">Transition</a>
+                                           aria-selected="false">Models</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" id="tab-horizontal-3-tab" data-bs-toggle="tab"
                                            href="#tab-horizontal-3"
-                                           role="tab" aria-controls="tab-horizontal-3" aria-selected="false">Transition
-                                            Permission</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="tab-horizontal-4-tab" data-bs-toggle="tab"
-                                           href="#tab-horizontal-4"
-                                           role="tab" aria-controls="tab-horizontal-4" aria-selected="false">Graph</a>
+                                           role="tab" aria-controls="tab-horizontal-3" aria-selected="false">Model
+                                            Configs</a>
                                     </li>
                                 </ul>
                                 <div class="tab-content">
+
+                                   {# DATASET #}
                                     <div class="tab-pane fade show active" id="tab-horizontal-1" role="tabpanel"
                                          aria-labelledby="tab-horizontal-1-tab">
                                         <div class="userDatatable userDatatable--ticket userDatatable--ticket--2 mt-1">
-                                            <div class="table-responsive">
-                                                <table class="table mb-0 table-borderless">
-                                                    <thead>
-                                                    <tr class="userDatatable-header">
-                                                        <th>
-                                                            <span class="userDatatable-title">ID</span>
-                                                        </th>
-                                                        <th>
-                                                            <span class="userDatatable-title">Node</span>
-                                                        </th>
-                                                        <th>
-                                                            <span class="userDatatable-title">Type</span>
-                                                        </th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    {% for nodes in nodesData %}
-                                                        <tr>
-                                                            <td>{{ forloop.counter }}</td>
-                                                            <td>
-                                                                <div class="d-flex">
-                                                                    <div class="userDatatable-inline-title">
-                                                                        <a href="#" class="text-dark fw-500">
-                                                                            <h6>{{ nodes.name }}</h6>
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="d-flex">
-                                                                    <div class="userDatatable-inline-title">
-                                                                        <h6>{{ nodes.stateType }}</h6>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    {% endfor %}
-
-                                                    </tbody>
-                                                </table>
+                                            <div class="action-btn my-3">
+                                                <a class="btn btn-primary shadow" data-bs-toggle="modal" href="#addDataset" role="button" aria-expanded="false"
+                                                    aria-controls="collapseOne">Add Dataset</a>
+                                            </div>
+                                            <div id="partial">
+                                                {% include 'pages/project/dataset/datasetTable.html' %}
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- RAW DATASET MODAL -->
+                                    <div class="modal fade" id="addDataset" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header justify-content-center">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Add Dataset</h5>
+                                                </div>
+                                                <div class="modal-body">
+                                                      {% include 'pages/project/dataset/datasetCreateForm.html' %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    {# MODELS #}
                                     <div class="tab-pane fade" id="tab-horizontal-2" role="tabpanel"
                                          aria-labelledby="tab-horizontal-2-tab">
                                         <div class="userDatatable userDatatable--ticket userDatatable--ticket--2 mt-1">
+                                            <div class="action-btn my-3">
+                                                <a href="#">
+                                                    <a class="btn btn-sm btn-primary shadow" data-bs-toggle="modal" href="#" role="button"
+                                                       aria-expanded="false" aria-controls="collapseOne">Add Model</a>
+                                                </a>
+                                            </div>
                                             <div class="table-responsive">
                                                 <table class="table mb-0 table-borderless">
                                                     <thead>
@@ -171,6 +136,8 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    {# MODEL CONFIGS #}
                                     <div class="tab-pane fade" id="tab-horizontal-3" role="tabpanel"
                                          aria-labelledby="tab-horizontal-3-tab">
                                         <div class="userDatatable userDatatable--ticket userDatatable--ticket--2 mt-1">
@@ -217,10 +184,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="tab-pane fade" id="tab-horizontal-4" role="tabpanel"
-                                         aria-labelledby="tab-horizontal-4-tab">
-                                        <p>{{ graph.graph }}</p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -230,7 +193,17 @@
         </div>
     </div>
 
-
 {% endblock %}
+
+
+{% block script %}
+    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.js"></script>
+    <script>
+    function getIdByClick(id) {
+        document.getElementById('id_raw_dataset').value = id;
+    }
+    </script>
+{% endblock script %}
+    
 
 

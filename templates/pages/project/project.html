@@ -1,0 +1,101 @@
+{% extends 'layout/app.html' %}
+
+{% block title %} Project {% endblock %}
+
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb-main">
+                    <h4 class="text-capitalize breadcrumb-title">Project</h4>
+                    <div class="breadcrumb-action justify-content-center flex-wrap">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="#"><i
+                                        class="las la-home"></i>Project</a></li>
+                                <li class="breadcrumb-item active"
+                                    aria-current="page">Projects
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="breadcrumb-main m-0 breadcrumb-main--table justify-content-sm-between ">
+                <div class="action-btn">
+                    <a href="{% url 'project:projectCreate' %}">
+                        <a class="btn btn-primary shadow" data-bs-toggle="modal" href="#addProject" role="button" aria-expanded="false" aria-controls="collapseOne">Add Project</a>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 mb-30">
+                <div class="support-ticket-system support-ticket-system--search">
+                    <div class="userDatatable userDatatable--ticket userDatatable--ticket--2 mt-1">
+                        <div class="table-responsive" id="projectList">
+                            {% include 'pages/project/partials/table.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- {# ADD PROJECT MODAL FORM #} -->
+    <div class="modal fade" id="addProject" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header justify-content-center">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Project</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="addForm">
+                        {% csrf_token %}
+                        <div class="mb3">
+                            <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Name of Project</label>
+                            {% render_field form.project_name class="form-control" %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" hx-post="{% url 'project:projectCreate' %}"
+                                    hx-target="#projectList" data-bs-dismiss="modal">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- {# FIRST MODAL END #} -->
+
+    <!-- {# UPDATE PROJECT MODAL FORM #} -->
+    <div class="modal fade" id="updateProject" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header justify-content-center">
+                    <h5 class="modal-title" id="exampleModalLabel">Update Project</h5>
+                </div>
+                <div class="modal-body" id="updateForm">
+                    {% include 'pages/project/partials/updateForm.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- {# SECOND MODAL END #} -->
+
+{% endblock %}
+{% block script %}
+    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.js"></script>
+<!-- {#    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script> #} -->
+    <script>
+        $('#addProject').on('hidden.bs.modal', function () {
+            $(this).find('form').trigger('reset');
+        })
+    </script>
+{% endblock %}
+

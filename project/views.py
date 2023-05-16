@@ -1,78 +1,13 @@
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from .models import Project
-from .forms import ProjectForm
-from .serializers import ProjectSerializer
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 
-
-####################### PROJECT API VIEWS ###########################
-# @api_view(['GET'])
-# def projectView(request, pk=None):
-#
-#     if request.method == 'GET':
-#         # Folder Detail View
-#         if pk is not None:
-#             try:
-#                 project = Project.objects.get(id=pk)
-#                 data = ProjectSerializer(project).data
-#             except ObjectDoesNotExist:
-#                 data = {"Error": "Folder does not Exist"}
-#             return Response(data)
-#
-#         # Folders List View
-#         projects = Project.objects.all()
-#         data = ProjectSerializer(projects, many=True).data
-#         return Response(data)
-#
-#
-# @api_view(['GET', 'POST'])
-# def projectCreate(request):
-#
-#     if request.method == 'POST':
-#         # Folder Create View
-#         ser = ProjectSerializer(data=request.data)
-#         if ser.is_valid(raise_exception=True):
-#             project_name = ser.validated_data.get('project_name')
-#             dataset_name = ser.validated_data.get('dataset_name')
-#             model_name = ser.validated_data.get('model_name')
-#
-#
-#             project = Project(name=project_name,
-#                                 dataset_name=dataset_name,
-#                                 model_name=model_name)
-#             project.save()
-#             return Response(ser.data)
-#
-#
-#
-#
-# @api_view(['DELETE'])
-# def projectDelete(request, pid=None):
-#
-#
-#     # ser = ProjectSerializer(data=request.data)
-#     # if ser.is_valid(raise_exception=True):
-#     project = Project.objects.get(id=pid)
-#     project.delete()
-#
-#     return Response({'message': 'Project deleted successfully'})
-#
-#
-# @api_view(['GET','PUT'])
-# def projectUpdate(request, pid=None):
-#     if request.method == 'PUT':
-#         project = Project.objects.get(id=pid)
-#         serializer = ProjectSerializer(project, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=400)
-
-
-##################### RENDER VIEWS ######################
+from project.models import Project
+from project.forms import ProjectForm
+from dataset.models import RawDataset
+from dataset.forms import RawDatasetForm, RawDatasetFileForm
 
 def index(request):
     return render(request, 'dashboard/main.html')
@@ -83,38 +18,66 @@ def projectView(request):
     form = ProjectForm()
     data = Project.objects.all()
     context = {"projects": data, "form": form}
-    return render(request, 'pages/clarify/project/project.html', context)
+    return render(request, 'pages/project/project.html', context)
 
 
 def projectDetailedView(request, pk):
-    pass
+    project = Project.objects.get(id=pk)
+    datasets = RawDataset.objects.filter(project=project.id)
+    datasetForm = RawDatasetForm()
+    dataFileForm = RawDatasetFileForm()
+    context = {"project": project,
+               "datasets": datasets,
+               "datasetForm": datasetForm,
+               "dataFileForm": dataFileForm
+               }
+    return render(request, 'pages/project/projectDetail.html', context)
 
 
 def createProject(request):
-    if request.method == 'POST':
-        print(request.POST)
-        form = ProjectForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('project:projects')
-        else:
-            print(form.errors)
-            return redirect('project:projects')
+    form = ProjectForm(request.POST)
+    if form.is_valid():
+        form.save()
+    else:
+        messages.warning(request, "Unable to add project")
+    data = Project.objects.all()
+    context = {"projects": data}
+    return render(request, 'pages/project/partials/table.html', context)
+
+
+def projectInstance(request, pk):
+    """
+    When update button is clicked, this function receives a GET request to render
+    Update form populated with the instance associated with the id
+    :param request:
+    :param pk:
+    :return: Update Form with instance
+    """
+    instance = Project.objects.get(id=pk)
+    form = ProjectForm(instance=instance)
+    context = {"form": form}
+    return render(request, 'pages/project/partials/updateForm.html', context)
 
 
 def updateProject(request):
-    if request.method == 'POST':
-        projectID = request.POST.get('id')
-        instance = Project.objects.get(id=projectID)
-        form = ProjectForm(request.POST, instance=instance)
-        if form.is_valid():
-            form.save()
-        return redirect('project:projects')
+    project_id = request.POST.get('id')
+    instance = Project.objects.get(id=project_id)
+    form = ProjectForm(request.POST, instance=instance)
+    if form.is_valid():
+        form.save()
+    else:
+        messages.danger(request, "Unable to Update Project")
+    data = Project.objects.all()
+    context = {"projects": data}
+    return render(request, 'pages/project/partials/table.html', context)
 
 
+@csrf_exempt
 def deleteProject(request, pk):
-    data = Project.objects.get(id=pk)
-    data.delete()
-    return redirect('project:projects')
+    project = Project.objects.get(id=pk)
+    project.delete()
+    data = Project.objects.all()
+    context = {"projects": data}
+    return render(request, 'pages/project/partials/table.html', context)
 
 
