@@ -144,4 +144,5 @@ CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_RESULT_BACKEND = "redis://localhost:6379"
 # CELERY_TASK_SERIALIZER = "pickle"
 
-DATA_DIRECTORY = os.path.join(BASE_DIR, 'data')
+DATA_DIRECTORY = os.path.join(BASE_DIR, 'yolo/data')
+MODEL_DIRECTORY = os.path.join(BASE_DIR, 'yolo/models')

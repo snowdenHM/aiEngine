@@ -4,7 +4,7 @@ import boto3
 import shutil
 import subprocess
 import environ
-from aiEngine.settings import DATA_DIRECTORY, \
+from aiEngine.settings import DATA_DIRECTORY, MODEL_DIRECTORY, \
                                 AWS_STORAGE_BUCKET_NAME, \
                                 AWS_ACCESS_KEY_ID, \
                                 AWS_SECRET_ACCESS_KEY
@@ -120,7 +120,6 @@ def upload_folder_to_s3(s3_bucket, s3_folder_path):
 def clear_data():
     file_path = 'yolo/yolov5/data.yaml'
     runs_path = 'yolo/yolov5/runs'
-    models_path = 'yolo/models'
     for item in os.listdir(DATA_DIRECTORY):
         item_path = os.path.join(DATA_DIRECTORY, item)
         if os.path.isfile(item_path):
@@ -131,8 +130,8 @@ def clear_data():
         os.remove(file_path)
     if os.path.exists(runs_path):
         shutil.rmtree(runs_path)
-    if os.path.exists(models_path):
-        if len(os.listdir(models_path)) > 0:
-            for file in os.listdir(models_path):
-                os.remove(f'{models_path}/{file}')
+    if os.path.exists(MODEL_DIRECTORY):
+        if len(os.listdir(MODEL_DIRECTORY)) > 0:
+            for file in os.listdir(MODEL_DIRECTORY):
+                os.remove(f'{MODEL_DIRECTORY}/{file}')
     
