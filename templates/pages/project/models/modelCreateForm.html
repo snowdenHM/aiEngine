@@ -1,0 +1,24 @@
+{% load widget_tweaks %}
+<form method="POST" enctype="multipart/form-data" hx-encoding="multipart/form-data">
+    {% csrf_token %}
+
+    <input type="text" class="form-control" id="id_project" name="project" value="{{ project.id }}" hidden>
+    <div class="row">
+        <div class="form-group">
+            <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Name of Model</label>
+            {% render_field modelForm.name class="form-control" %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group">
+            <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Type of Model</label>
+            {% render_field modelForm.model_type class="form-select" %}
+        </div>
+    </div>
+    <br>
+
+    <div class="row d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary" hx-post="{% url 'model:modelCreate' project.id  %}"
+            hx-target="#modelList" data-bs-dismiss="modal">Submit</button>
+    </div>
+</form>

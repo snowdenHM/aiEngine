@@ -1,13 +1,15 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 
 from project.models import Project
 from project.forms import ProjectForm
-from dataset.models import RawDataset
-from dataset.forms import RawDatasetForm, RawDatasetFileForm
+from dataset.models import Dataset
+from dataset.forms import DatasetForm
+from modelMarketplace.models import ModelSetup, ModelTrainingConfig, ModelHistoryDetails
+from modelMarketplace.forms import ModelSetupForm, ModelTrainingConfigForm, ModelHistoryDetailsForm
 
 def index(request):
     return render(request, 'dashboard/main.html')
@@ -23,14 +25,17 @@ def projectView(request):
 
 def projectDetailedView(request, pk):
     project = Project.objects.get(id=pk)
-    datasets = RawDataset.objects.filter(project=project.id)
-    datasetForm = RawDatasetForm()
-    dataFileForm = RawDatasetFileForm()
+    datasets = Dataset.objects.filter(project=project.id)
+    models = ModelSetup.objects.all()
+    datasetForm = DatasetForm()
+    modelSetupForm = ModelSetupForm()
+    modelConfigForm = ModelTrainingConfigForm()
     context = {"project": project,
                "datasets": datasets,
                "datasetForm": datasetForm,
-               "dataFileForm": dataFileForm
-               }
+               "models": models,
+               "modelForm": modelSetupForm,
+               "modelConfigForm": modelConfigForm}
     return render(request, 'pages/project/projectDetail.html', context)
 
 

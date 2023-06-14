@@ -1,3 +1,6 @@
 from django.contrib import admin
+from modelMarketplace.models import ModelSetup, ModelTrainingConfig, ModelHistoryDetails
 
-# Register your models here.
+admin.site.register(ModelSetup)
+admin.site.register(ModelTrainingConfig)
+admin.site.register(ModelHistoryDetails)

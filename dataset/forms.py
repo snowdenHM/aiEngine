@@ -1,21 +1,20 @@
 from django import forms
-from .models import RawDataset, RawDatasetFile
+from .models import Dataset
 
-
-class RawDatasetForm(forms.ModelForm):
+class DatasetForm(forms.ModelForm):
 
     compressed_file = forms.FileField(required=True)
-
+    compressed_annotation_file = forms.FileField(required=True)
+    classes_config_file = forms.FileField(required=True)
     class Meta:
-        model = RawDataset
+        model = Dataset
         fields = "__all__"
 
+# class AnnotationForm(forms.ModelForm):
 
-class RawDatasetFileForm(forms.ModelForm):
+#     compressed_file = forms.FileField(required=True)
 
-    class Meta:
-        model = RawDatasetFile
-        fields = ['raw_dataset', 'file_upload']
-        widgets = {
-            'file_upload': forms.FileInput()
-        }
+#     class Meta:
+#         model = Annotation
+#         fields = "__all__"
+         

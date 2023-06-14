@@ -1,0 +1,46 @@
+{% load widget_tweaks %}
+<form method="POST" enctype="multipart/form-data" hx-encoding="multipart/form-data">
+    {% csrf_token %}
+
+    <input type="text" class="form-control" id="id_model" name="model" hidden>
+    <div class="row">
+        <div class="form-group">
+            <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Number of Epochs</label>
+            {% render_field modelConfigForm.num_of_epochs class="form-control" %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Image Size</label>
+                {% render_field modelConfigForm.img_size class="form-select" %}
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Batch Size</label>
+                {% render_field modelConfigForm.batch_size class="form-select" %}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Optimizer</label>
+                {% render_field modelConfigForm.optimizer class="form-select" %}
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Model Size</label>
+                {% render_field modelConfigForm.yolo_choice class="form-select" %}
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="row d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary" hx-post="{% url 'model:modelConfig' project.id  %}"
+             data-bs-dismiss="modal">Submit</button>
+    </div>
+</form>

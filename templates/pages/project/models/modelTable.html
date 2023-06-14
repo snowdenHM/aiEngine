@@ -1,0 +1,67 @@
+<div class="table-responsive" id="modelList">
+    <table class="table mb-0 table-borderless">
+        <thead>
+        <tr class="userDatatable-header">
+            <th>
+                <span class="userDatatable-title">ID</span>
+            </th>
+            <th>
+                <span class="userDatatable-title">Name</span>
+            </th>
+            <th>
+                <span class="userDatatable-title">Type</span>
+            </th>
+            <th class="actions">
+                <span class="userDatatable-title">Actions</span>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for model in models %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <div class="d-flex">
+                        <div class="userDatatable-inline-title">
+                            <a href="#" class="text-dark fw-500">
+                                <h6>{{ model.name }}</h6>
+                            </a>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex">
+                        <div class="userDatatable-inline-title">
+                            <h6>{{ model.model_type }}</h6>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <ul class="orderDatatable_actions mb-0 d-flex flex-wrap">
+                        <li>
+                            <a class="view" data-bs-toggle="modal" href="#addModelConfig" onclick="getModelId(`{{ model.id }}`)"
+                            aria-expanded="false" aria-controls="collapseOne">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'model:modelTraining' pk=project.id model_pk=model.id %}" class="edit">
+                                <i class="fa fa-server"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="" hx-delete="{% url 'model:modelDelete' pk=project.id model_pk=model.id %}"
+                               hx-confirm="Delete Model ?"
+                               hx-target="#modelList"
+                               class="remove">
+                                <i class="uil uil-trash-alt"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+</div>

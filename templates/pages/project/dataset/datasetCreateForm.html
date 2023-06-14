@@ -26,18 +26,24 @@
                 {% render_field datasetForm.val_ratio class="form-control" %}
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Test Ratio</label>
-                {% render_field datasetForm.test_ratio class="form-control" %}
-            </div>
-        </div>
     </div>
     <br>
     <div class="row">
         <div class="form-group">
-            <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">File Upload</label>
+            <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Dataset File Upload</label>
             {% render_field datasetForm.compressed_file class="form-control" %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group">
+            <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Annotations File Upload</label>
+            {% render_field datasetForm.compressed_annotation_file class="form-control" %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group">
+            <label for="a8" class="il-gray fs-14 fw-500 align-center mb-10">Classes Configuration File (.txt)</label>
+            {% render_field datasetForm.classes_config_file class="form-control" %}
         </div>
     </div>
     <br>
